@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     #options.add_argument("--headless")
 
-    driver = uc.Chrome(version_main=99, options=options)
+    driver = uc.Chrome(version_main=103, options=options)
     driver.get("https://bookit.unimelb.edu.au/cire/login.aspx")
 
     login_listener = '''
@@ -109,6 +109,12 @@ if __name__ == "__main__":
         levels.select_by_value(list_id)
 
 
+    def get_date():
+        WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.ID, "gridDate")))
+        date = driver.find_element(By.ID, "gridDate")
+        return date.get_attribute("value")
+
+
     def select_next_workday():
         # Change date
         WebDriverWait(driver, 10).until(
@@ -158,14 +164,24 @@ if __name__ == "__main__":
 
                 time.sleep(0.3)
 
-                end_time_select = Select(driver.find_element(By.ID, "endTime"))
-                end_time = driver.find_element(By.ID, "endTime").find_elements(By.TAG_NAME, "option")[
-                    -1].get_attribute(
-                    "value")
+                while True:
+                    try:
+                        end_time_select = Select(driver.find_element(By.ID, "endTime"))
+                        end_time = driver.find_element(By.ID, "endTime").find_elements(By.TAG_NAME, "option")[
+                            -1].get_attribute(
+                            "value")
+                        break
+                    except:
+                        pass
 
-                if check_time((start_time, end_time)):
-                    end_time_select.select_by_value(end_time)
-                    driver.find_element(By.ID, "submitButton").click()
+                if check_time((start_time, end_time), get_date()):
+                    while True:
+                        try:
+                            end_time_select.select_by_value(end_time)
+                            driver.find_element(By.ID, "submitButton").click()
+                            break
+                        except:
+                            pass
 
                     time.sleep(1)
 
@@ -173,17 +189,31 @@ if __name__ == "__main__":
                         text = driver.find_element(By.CLASS_NAME, "expectedException").text
                         if text != "":
                             if text == "Bookings are limited to one hour per day per site.":
-                                print("Max bookings exceeded")
+                                print("Site booking exceeded")
+                                driver.find_element(By.CLASS_NAME, "dialogClose").click()
 
+                                return "break"
+                            else:
+                                print(text)
+                                '''
                                 time.sleep(0.5)
                                 driver.quit()
                                 time.sleep(0.5)
                                 sys.exit(0)
-                            else:
-                                print(text)
-                            driver.find_element(By.CLASS_NAME, "dialogClose").click()
+                                '''
+                                while True:
+                                    pass
                     except NoSuchElementException as e:
                         print(f"Found a slot for {room_name} at {start_time} - {end_time}")
+                        insert_reserved_time((start_time, end_time), get_date())
+
+                        res = requests.post(url="http://mangotests.asuscomm.com:5000/recordnewbooking",
+                                      data={"CurrentDate": datetime.strptime(get_date(), "%d/%m/%Y").strftime("%Y-%m-%d"),
+                                            "StartTime": start_time,
+                                            "EndTime": end_time},
+                                      headers={"Content-Type": "application/x-www-form-urlencoded"})
+
+                        print(res.text)
 
                     return True
 
@@ -204,7 +234,14 @@ if __name__ == "__main__":
                 continue
 
             for slots in room.find_elements(By.TAG_NAME, "div"):
-                if slots.get_attribute("class") == "ts tsWht":
+                while True:
+                    try:
+                        slot_select = slots.get_attribute("class")
+                        break
+                    except:
+                        pass
+
+                if slot_select == "ts tsWht":
                     while True:
                         try:
                             slots.click()
@@ -212,7 +249,10 @@ if __name__ == "__main__":
                         except:
                             pass
 
-                    if not iter_slots():
+                    res = iter_slots()
+                    if res == "break":
+                        return
+                    else:
                         break
 
 
@@ -225,12 +265,11 @@ if __name__ == "__main__":
 
     select_next_workday()
 
-    for floor in ALL_LEVELS:
-        select_level(floor)
-        time.sleep(1)
-        iter_floor()
-
     while True:
-        pass
+        for floor in ALL_LEVELS:
+            select_level(floor)
+            time.sleep(1)
+            iter_floor()
 
+        select_next_workday()
 

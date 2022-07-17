@@ -1,19 +1,25 @@
 from datetime import datetime, timedelta
+import requests
 
 START = datetime(1900, 1, 1, 10, 0, 0)
 END = datetime(1900, 1, 1, 19, 0, 0)
 
-reserved = []
+all_reserved = {}
 testing_times = [("10:00:00", "11:45:00"), ("13:15:00", "14:30:00"), ("12:30:00", "14:00:00"), ("17:00:00", "17:15:00")]
 
 
-def populate_free():
+def populate_free(curr_date):
     """
     Populates list of free times given list of reserved times
     :return: list of free times
     """
 
     free_arr = []
+
+    if curr_date not in all_reserved:
+        all_reserved[curr_date] = []
+
+    reserved = all_reserved[curr_date]
 
     # Set entire day to one big free slot
     if len(reserved) == 0:
@@ -35,16 +41,37 @@ def populate_free():
     return free_arr
 
 
-def check_time(time):
+def check_time(time, curr_date):
     """
     Checks if time should be reserved or not
+    :param curr_date:
     :param time: Time in format "HH:MM:SS"
     :return: Boolean true/false
     """
     start = datetime.strptime(time[0], "%H:%M:%S")
     end = datetime.strptime(time[1], "%H:%M:%S")
 
-    free = populate_free()
+    free = populate_free(curr_date)
+
+    print(free)
+
+    for empty_times in free:
+        if empty_times[1] - empty_times[0] >= timedelta(minutes=30) and empty_times[0] <= start < empty_times[1]:
+            return True
+
+    return False
+
+
+def insert_reserved_time(time, curr_date):
+    start = datetime.strptime(time[0], "%H:%M:%S")
+    end = datetime.strptime(time[1], "%H:%M:%S")
+
+    free = populate_free(curr_date)
+
+    if curr_date not in all_reserved:
+        all_reserved[curr_date] = []
+
+    reserved = all_reserved[curr_date]
 
     for empty_times in free:
         if empty_times[1] - empty_times[0] >= timedelta(minutes=30) and empty_times[0] <= start < empty_times[1]:
@@ -58,14 +85,14 @@ def check_time(time):
                 else:
                     reserved.append((start, end))
 
-            return True
 
-    return False
+resp = requests.get("http://mangotests.asuscomm.com:5000/getallbookings").json()
+for booking in resp:
+    date = datetime.strptime(booking["bookingDate"], "%Y-%m-%d")
+    date_formatted = date.strftime("%d/%m/%Y")
+    if date_formatted not in all_reserved:
+        all_reserved[date_formatted] = []
 
-'''
-for free_times in testing_times:
-    if check_time(free_times):
-        print("Reserved: " + str(free_times))
+    insert_reserved_time((booking["bookingStartTime"], booking["bookingEndTime"]), date_formatted)
 
-print(reserved)
-'''
+print(all_reserved)
