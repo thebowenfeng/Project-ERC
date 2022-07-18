@@ -207,7 +207,7 @@ if __name__ == "__main__":
                         print(f"Found a slot for {room_name} at {start_time} - {end_time}")
                         insert_reserved_time((start_time, end_time), get_date())
 
-                        res = requests.post(url="http://mangotests.asuscomm.com:5000/recordnewbooking",
+                        res = requests.post(url="http://mangotests.asuscomm.com/recordnewbooking",
                                       data={"CurrentDate": datetime.strptime(get_date(), "%d/%m/%Y").strftime("%Y-%m-%d"),
                                             "StartTime": start_time,
                                             "EndTime": end_time},

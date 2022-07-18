@@ -86,7 +86,7 @@ def insert_reserved_time(time, curr_date):
                     reserved.append((start, end))
 
 
-resp = requests.get("http://mangotests.asuscomm.com:5000/getallbookings").json()
+resp = requests.get("http://mangotests.asuscomm.com/getallbookings").json()
 for booking in resp:
     date = datetime.strptime(booking["bookingDate"], "%Y-%m-%d")
     date_formatted = date.strftime("%d/%m/%Y")
