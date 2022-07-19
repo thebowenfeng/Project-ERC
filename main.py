@@ -30,6 +30,8 @@ options.add_experimental_option('useAutomationExtension', False)
 driver = webdriver.Chrome(executable_path="chromedriver.exe", options=options)
 '''
 
+ROOM_NAMES= ["123", "124", "206", "207", "211", "212", "G15"]
+
 if __name__ == "__main__":
     options = uc.ChromeOptions()
 
@@ -99,7 +101,8 @@ if __name__ == "__main__":
     # 142: L1 access technology room
     # 133: L1 group space
     # 134: L2 group space
-    ALL_LEVELS = ["133", "134", "142"]
+    # 146: Ground large space
+    ALL_LEVELS = ["133", "134", "146"]
 
 
     def select_level(list_id):
@@ -207,10 +210,16 @@ if __name__ == "__main__":
                         print(f"Found a slot for {room_name} at {start_time} - {end_time}")
                         insert_reserved_time((start_time, end_time), get_date())
 
+                        room_code = None
+                        for code in ROOM_NAMES:
+                            if code in room_name:
+                                room_code = code
+
                         res = requests.post(url="http://mangotests.asuscomm.com/recordnewbooking",
                                       data={"CurrentDate": datetime.strptime(get_date(), "%d/%m/%Y").strftime("%Y-%m-%d"),
                                             "StartTime": start_time,
-                                            "EndTime": end_time},
+                                            "EndTime": end_time,
+                                            "RoomNumber": room_code},
                                       headers={"Content-Type": "application/x-www-form-urlencoded"})
 
                         print(res.text)
