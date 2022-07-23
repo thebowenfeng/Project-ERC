@@ -60,6 +60,7 @@ if __name__ == "__main__":
     '''
 
     driver.execute_script('document.getElementsByTagName("header")[1].innerHTML = "<h1>lol :)</h1>"')
+    user = ""
 
     # Check if password is already saved
     if os.path.exists("creds.txt"):
@@ -73,6 +74,7 @@ if __name__ == "__main__":
             driver.find_element(By.ID, "password_box").send_keys(password)
 
             driver.execute_script('document.getElementById("login_cmd").click()')
+            user = username
     else:
         driver.execute_script(login_listener)
 
@@ -96,6 +98,7 @@ if __name__ == "__main__":
                     print(f"Success: Username: {parsed[1]} Password: {parsed[2]}")
                     with open("creds.txt", "w") as f:
                         f.write(parsed[1] + " " + parsed[2])
+                    user = parsed[1]
                     break
 
     # 142: L1 access technology room
@@ -219,7 +222,8 @@ if __name__ == "__main__":
                                       data={"CurrentDate": datetime.strptime(get_date(), "%d/%m/%Y").strftime("%Y-%m-%d"),
                                             "StartTime": start_time,
                                             "EndTime": end_time,
-                                            "RoomNumber": room_code},
+                                            "RoomNumber": room_code,
+                                            "BookedBy": user},
                                       headers={"Content-Type": "application/x-www-form-urlencoded"})
 
                         print(res.text)
