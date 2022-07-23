@@ -54,7 +54,7 @@ def check_time(time, curr_date):
     free = populate_free(curr_date)
 
     for empty_times in free:
-        if empty_times[1] - empty_times[0] >= timedelta(minutes=30) and empty_times[0] <= start < empty_times[1]:
+        if empty_times[1] - empty_times[0] >= timedelta(minutes=30) and empty_times[0] <= start < empty_times[1] and empty_times[0] <= end < empty_times[1]:
             return True
 
     return False
