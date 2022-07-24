@@ -13,6 +13,7 @@ from datetime import datetime
 import os
 import sys
 import time
+import platform
 
 from time_ops import *
 '''
@@ -35,15 +36,12 @@ ROOM_NAMES= ["123", "124", "206", "207", "211", "212", "G15"]
 if __name__ == "__main__":
     options = uc.ChromeOptions()
 
-    #options.add_argument("--headless")
-
-    driver = uc.Chrome(version_main=103, options=options)
-    driver.get("https://bookit.unimelb.edu.au/cire/login.aspx")
-
     login_listener = '''
     document.getElementById("login_cmd").addEventListener("click", function() {
         var username = document.getElementById("username_box").value;
         var password = document.getElementById("password_box").value;
+        
+        console.log("asdfasdfdasf");
         
         alert("value " + username + " " + password);
         
@@ -56,14 +54,28 @@ if __name__ == "__main__":
                 alert("success");
             }
         }, 500)
-    })
+    });
+    
+    document.addEventListener("keypress", (event => {
+        if (event.key == "Enter") {
+            var username = document.getElementById("username_box").value;
+            var password = document.getElementById("password_box").value;
+            
+            console.log("asdfasdfdasf");
+            
+            alert("value " + username + " " + password);
+        }
+    }));
     '''
 
-    driver.execute_script('document.getElementsByTagName("header")[1].innerHTML = "<h1>lol :)</h1>"')
     user = ""
 
     # Check if password is already saved
     if os.path.exists("creds.txt"):
+        options.add_argument("--headless")
+        driver = uc.Chrome(version_main=103, options=options)
+        driver.get("https://bookit.unimelb.edu.au/cire/login.aspx")
+
         with open("creds.txt", "r") as f:
             creds = f.read().split(" ")
             username = creds[0]
@@ -76,6 +88,11 @@ if __name__ == "__main__":
             driver.execute_script('document.getElementById("login_cmd").click()')
             user = username
     else:
+        driver = uc.Chrome(version_main=103, options=options)
+        driver.get("https://bookit.unimelb.edu.au/cire/login.aspx")
+
+        driver.execute_script(
+            'document.getElementsByTagName("header")[1].innerHTML = "<h1>Please log in to bookit :)</h1>"')
         driver.execute_script(login_listener)
 
         while True:
@@ -94,12 +111,22 @@ if __name__ == "__main__":
                     if parsed[0] == "error":
                         print(f"Error: {parsed[1]}")
                         alert.dismiss()
+                        sys.exit(1)
                 except TimeoutException:
                     print(f"Success: Username: {parsed[1]} Password: {parsed[2]}")
                     with open("creds.txt", "w") as f:
                         f.write(parsed[1] + " " + parsed[2])
+
+                    if platform.system() == "Windows":
+                        os.system("start cmd /k python main.py")
+                    else:
+                        print("Please re-run main.py")
+
+                    driver.close()
+                    sys.exit(1)
                     user = parsed[1]
                     break
+
 
     # 142: L1 access technology room
     # 133: L1 group space
