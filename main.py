@@ -122,27 +122,15 @@ if __name__ == "__main__":
 
 
     def select_next_workday():
-        # Change date
         WebDriverWait(driver, 10).until(
-            expected_conditions.presence_of_element_located((By.CLASS_NAME, "ui-datepicker-calendar")))
+            expected_conditions.presence_of_element_located(
+                (By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")))
 
-        date_change = '''
-        var body = document.querySelector("#ui-datepicker-div > table > tbody");
-    
-        for(var i = 0; i < body.childNodes.length; i++){
-            var row = body.childNodes[i];
-            for(var j = 0; j < row.childNodes.length; j++){
-                var cell = row.childNodes[j];
-                var classAttr = cell.getAttribute("class");
-                if(classAttr === ' '){
-                    cell.click();
-                    break;
-                }
-            }
-        }
-        '''
+        elem = driver.find_element(By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")
+        elem.click()
 
-        driver.execute_script(date_change)
+        while datetime.strptime(get_date(), "%d/%m/%Y").weekday() > 4:
+            elem.click()
 
 
     def iter_slots():
