@@ -157,7 +157,18 @@ if __name__ == "__main__":
         elem.click()
 
         while datetime.strptime(get_date(), "%d/%m/%Y").weekday() > 4:
-            elem.click()
+            WebDriverWait(driver, 10).until(
+                expected_conditions.presence_of_element_located(
+                    (By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")))
+
+            elem = driver.find_element(By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")
+
+            while True:
+                try:
+                    elem.click()
+                    break
+                except:
+                    pass
 
 
     def iter_slots():
@@ -177,7 +188,13 @@ if __name__ == "__main__":
             WebDriverWait(driver, 10).until(
                 expected_conditions.presence_of_element_located((By.ID, "startTime")))
 
-            option = driver.find_element(By.ID, "startTime").find_elements(By.TAG_NAME, "option")[i]
+            while True:
+                try:
+                    option = driver.find_element(By.ID, "startTime").find_elements(By.TAG_NAME, "option")[i]
+                    break
+                except:
+                    pass
+                
             time_select = Select(driver.find_element(By.ID, "startTime"))
 
             while True:
