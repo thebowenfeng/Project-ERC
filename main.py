@@ -171,6 +171,8 @@ if __name__ == "__main__":
 
         time.sleep(0.1)
 
+        print(f"Looking at room {room_name} on date {get_date()}")
+
         while i < start_time_num:
             WebDriverWait(driver, 10).until(
                 expected_conditions.presence_of_element_located((By.ID, "startTime")))
@@ -178,7 +180,12 @@ if __name__ == "__main__":
             option = driver.find_element(By.ID, "startTime").find_elements(By.TAG_NAME, "option")[i]
             time_select = Select(driver.find_element(By.ID, "startTime"))
 
-            start_time = option.get_attribute("value")
+            while True:
+                try:
+                    start_time = option.get_attribute("value")
+                    break
+                except:
+                    pass
 
             if START <= datetime.strptime(start_time, "%H:%M:%S") <= END:
                 time_select.select_by_value(start_time)
@@ -245,7 +252,12 @@ if __name__ == "__main__":
 
                     return True
 
-            start_time_num = len(driver.find_element(By.ID, "startTime").find_elements(By.TAG_NAME, "option"))
+            while True:
+                try:
+                    start_time_num = len(driver.find_element(By.ID, "startTime").find_elements(By.TAG_NAME, "option"))
+                    break
+                except:
+                    pass
             i += 1
 
         print("done")
@@ -258,7 +270,14 @@ if __name__ == "__main__":
     def iter_floor():
         WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "bookingStrip")))
         for room in driver.find_elements(By.CLASS_NAME, "bookingStrip"):
-            if room.get_attribute("id") in ["bookingStrip2505", "bookingStrip2506"]:
+            while True:
+                try:
+                    room_id = room.get_attribute("id")
+                    break
+                except:
+                    pass
+
+            if room_id in ["bookingStrip2505", "bookingStrip2506"]:
                 continue
 
             for slots in room.find_elements(By.TAG_NAME, "div"):
