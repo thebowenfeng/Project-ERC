@@ -238,14 +238,15 @@ if __name__ == "__main__":
                                         driver.find_element(By.CLASS_NAME, "dialogClose").click()
 
                                         return "break"
-                                    else:
-                                        print(text)
-                                        '''
-                                        time.sleep(0.5)
+                                    elif text == "Maximum outstanding bookings time limit reached!":
+                                        print("Maximum booking exceeded.")
+                                        # cleanup
+                                        driver.close()
                                         driver.quit()
                                         time.sleep(0.5)
                                         sys.exit(0)
-                                        '''
+                                    else:
+                                        print(text)
                                         while True:
                                             pass
                             except NoSuchElementException as e:
