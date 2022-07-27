@@ -111,7 +111,7 @@ if __name__ == "__main__":
                     if parsed[0] == "error":
                         print(f"Error: {parsed[1]}")
                         alert.dismiss()
-                        sys.exit(1)
+                        sys.exit(0)
                 except TimeoutException:
                     print(f"Success: Username: {parsed[1]} Password: {parsed[2]}")
                     with open("creds.txt", "w") as f:
@@ -123,7 +123,7 @@ if __name__ == "__main__":
                         print("Please re-run main.py")
 
                     driver.close()
-                    sys.exit(1)
+                    sys.exit(0)
                     user = parsed[1]
                     break
 
