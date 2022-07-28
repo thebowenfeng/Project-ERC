@@ -153,8 +153,13 @@ if __name__ == "__main__":
             expected_conditions.presence_of_element_located(
                 (By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")))
 
-        elem = driver.find_element(By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")
-        elem.click()
+        while True:
+            try:
+                elem = driver.find_element(By.XPATH, "//a[@class='buttonIconS buttonIconS-right' and @title='Next']")
+                elem.click()
+                break
+            except:
+                pass
 
         while datetime.strptime(get_date(), "%d/%m/%Y").weekday() > 4:
             WebDriverWait(driver, 10).until(
