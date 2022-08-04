@@ -224,7 +224,7 @@ if __name__ == "__main__":
 
                     for end_time in reversed(end_time_options):
                         prev_end_time = end_time
-                        if check_time((start_time, end_time), get_date()):
+                        if check_time((start_time, end_time), get_date()) and datetime.strptime(end_time, "%H:%M:%S") - start_time_dt >= timedelta(minutes=30):
                             while True:
                                 try:
                                     Select(driver.find_element(By.ID, "endTime")).select_by_value(end_time)
