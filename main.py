@@ -263,7 +263,7 @@ if __name__ == "__main__":
                                     if code in room_name:
                                         room_code = code
 
-                                res = requests.post(url="http://mangotests.asuscomm.com/recordnewbooking",
+                                res = requests.post(url="http://mangotests.asuscomm.com/recordnewbooking/thrr53t-sq1v-w3anh-2iys8z41-k-pyq2xk.nnf0a6jv5si4jz0fg9640dtaeifmfmse.8gzuqxkj777u330ockn63xcx884g.jt7i.oc6g35zobppnd9s-ueuz1tar",
                                                     data={"CurrentDate": datetime.strptime(get_date(),
                                                                                            "%d/%m/%Y").strftime(
                                                         "%Y-%m-%d"),
